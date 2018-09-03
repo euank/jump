@@ -52,9 +52,9 @@ func Open(name string) (File, error) {
 }
 
 type file struct {
-	to    string
-	tmp   *os.File
-	dirty bool
+	to       string
+	tmp      *os.File
+	writeErr bool
 }
 
 func (f *file) Read(p []byte) (int, error) {
@@ -64,7 +64,7 @@ func (f *file) Read(p []byte) (int, error) {
 func (f *file) Write(p []byte) (int, error) {
 	n, err := f.tmp.Write(p)
 	if err != nil {
-		f.dirty = true
+		f.writeErr = true
 	}
 
 	return n, err
@@ -83,7 +83,7 @@ func (f *file) Close() error {
 		return err
 	}
 
-	if f.dirty {
+	if f.writeErr {
 		return nil
 	}
 
